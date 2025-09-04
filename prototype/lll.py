@@ -1,6 +1,6 @@
-# GSO - Gram Schmidt Orthogonalization
+# LLL algorithm
+
 import numpy as np
-from numpy.typing import NDArray
 
 # matrix standard
 """
@@ -109,13 +109,17 @@ def computeLLL(basis: np.ndarray, a: float) -> np.ndarray:
                 k -= 1
     return basis_reduced
 
-basis = np.array([
-    [-2,  7,  7, -5],
-    [ 3, -2,  6, -1],
-    [ 2, -8, -9, -7],
-    [ 8, -9,  6, -4]
-], dtype=float)
+def _main():
+    basis = np.array([
+        [-2,  7,  7, -5],
+        [ 3, -2,  6, -1],
+        [ 2, -8, -9, -7],
+        [ 8, -9,  6, -4]
+    ], dtype=float)
 
-basis_reduced = computeLLL(basis, 1)
+    basis_reduced = computeLLL(basis, 1)
 
-print(basis_reduced)
+    print(basis_reduced)
+
+if __name__ == "__main__":
+    _main()
