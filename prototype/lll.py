@@ -45,7 +45,7 @@ def computeGSO(basis: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return basis_ortho, coefficients
 
 
-def computeLLL(basis: np.ndarray, a: float) -> np.ndarray:
+def computeLLL(basis: np.ndarray, a: float=3/4) -> np.ndarray:
     """
     Computes the LLL alpha reduced basis for the Latice based on the matri of basis vectors
     returns the alpha reduced basis
