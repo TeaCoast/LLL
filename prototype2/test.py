@@ -1,6 +1,9 @@
-import numpy as np
+class Hello:
+    def __getitem__(self, index):
+        print(index)
 
-a = np.array([1, 2, 3])
-b = np.array([10, 20, 30])
 
-print(np.gcd(a, b))
+hello = Hello()
+hello[0]
+hello[0, 1, 2]
+hello[(0, 1, 2), [2, 3, 4]]
