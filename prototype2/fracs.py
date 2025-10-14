@@ -34,9 +34,20 @@ class Fracs:
         return Frac(int(num), int(den))
     
     def dot(fracs1: 'Fracs', fracs2: 'Fracs') -> Frac:
-        assert fracs1.nums.shape == fracs2.nums.shape
-        assert len(fracs1.nums.shape) == 1
-        return fracs1.__mul__(fracs2).get_sum()
+        if len(fracs1.nums.shape) == len(fracs2.nums.shape) == 1:
+            assert fracs1.nums.shape == fracs2.nums.shape
+            return fracs1.__mul__(fracs2).get_sum()
+        elif len(fracs1.nums.shape) == len(fracs2.nums.shape) == 2:
+            assert fracs1.nums.shape[1] == fracs2.nums.shape[0]
+            rows, cols = (fracs1.nums.shape[0], fracs2.nums.shape[1])
+            new_fracs = Fracs(np.zeros((rows, cols), dtype=int))
+            for col in range(cols):
+                col_fracs = fracs2.T[col]
+                for row in range(cols):
+                    new_fracs[row, col] = fracs1[row].dot(col_fracs)
+            return new_fracs
+        raise ValueError("shapes of fracs1 and fracs2 do not align for dot product")
+
     
     def copy(self) -> 'Fracs':
         return Fracs(self.nums.copy(), self.dens.copy())
@@ -138,7 +149,7 @@ class Fracs:
         return Fracs(self.nums.T, self.dens.T)
 
     def __str__(self):
-        array = self.nums.astype(str) + '/' + self.dens.astype(str)
+        array: np.ndarray = self.nums.astype(str) + '/' + self.dens.astype(str)
         return str(array).replace("'", "")
     
 

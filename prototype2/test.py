@@ -1,9 +1,6 @@
-class Hello:
-    def __getitem__(self, index):
-        print(index)
+import numpy as np
 
+hi = np.array([[1, 2], [3, 4]])
 
-hello = Hello()
-hello[0]
-hello[0, 1, 2]
-hello[(0, 1, 2), [2, 3, 4]]
+print(hi[0][1])
+print(hi[0, 1])

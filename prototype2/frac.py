@@ -27,6 +27,15 @@ class Frac(tuple[int, int]):
             return NotImplemented
         return Frac((den*np.sign(num), abs(num)))
     
+    def floordiv(frac: 'Frac') -> int:
+        return frac.num // frac.den
+
+    def round(frac: 'Frac') -> int:
+        return frac.__add__(Frac(1, 2)).floordiv()
+    
+    def abs(frac: 'Frac') -> 'Frac':
+        return Frac(abs(frac.num), frac.den)
+    
     def __neg__(frac: 'Frac') -> 'Frac':
         try:
             num, den = Frac(frac)
@@ -75,6 +84,11 @@ class Frac(tuple[int, int]):
     
     def __rtruediv__(frac1: 'Frac', frac2: 'Frac'):
         return Frac.__truediv__(frac2, frac1)
+    
+    def __pow__(frac: 'Frac', power: int):
+        if not isinstance(power, (int, np.signedinteger)):
+            return NotImplemented
+        return Frac(frac.num ** power, frac.den ** power)
     
     def __eq__(frac1: 'Frac', frac2: 'Frac'):
         try:
@@ -141,6 +155,10 @@ def _main():
     assert tuple(Frac(-26, 13)) == tuple(Frac(26, -13)) == (-2, 1)
     assert -Frac(5, 8) + 2 * Frac(5, 3) - 1 - Frac(2, 3) / Frac(9, 7) / 5 == Frac(1733, 1080)
     assert Frac(5, 8) < Frac(2, 3)
+    assert Frac(13, 2).round() == 7
+    assert Frac(13, 2).floordiv() == 6
+    print(Frac(-26, 4).round(), Frac(-26, 4).floordiv())
+    print(round(-5.5), round(-4.5))
 
 if __name__ == "__main__":
     _main()
