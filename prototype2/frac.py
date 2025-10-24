@@ -30,10 +30,10 @@ class Frac(tuple[int, int]):
     def floordiv(frac: 'Frac') -> int:
         return frac.num // frac.den
 
-    def round(frac: 'Frac') -> int:
+    def __round__(frac: 'Frac') -> int:
         return frac.__add__(Frac(1, 2)).floordiv()
     
-    def abs(frac: 'Frac') -> 'Frac':
+    def __abs__(frac: 'Frac') -> 'Frac':
         return Frac(abs(frac.num), frac.den)
     
     def __neg__(frac: 'Frac') -> 'Frac':
@@ -85,9 +85,11 @@ class Frac(tuple[int, int]):
     def __rtruediv__(frac1: 'Frac', frac2: 'Frac'):
         return Frac.__truediv__(frac2, frac1)
     
-    def __pow__(frac: 'Frac', power: int):
+    def __pow__(frac: 'Frac', power: int) -> 'Frac':
         if not isinstance(power, (int, np.signedinteger)):
             return NotImplemented
+        if power < 0:
+            return Frac(frac.den ** abs(power), frac.num ** abs(power))
         return Frac(frac.num ** power, frac.den ** power)
     
     def __eq__(frac1: 'Frac', frac2: 'Frac'):

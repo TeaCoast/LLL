@@ -48,6 +48,11 @@ class Fracs:
             return new_fracs
         raise ValueError("shapes of fracs1 and fracs2 do not align for dot product")
 
+    def get_row_sums(self) -> 'Fracs':
+        assert len(self.shape) == 2
+        dens = np.apply_along_axis(np.lcm.reduce, axis=1, arr=self.dens)
+        nums = np.sum(dens[:, np.newaxis]*self.nums//self.dens, axis=1)
+        return Fracs(nums, dens)
     
     def copy(self) -> 'Fracs':
         return Fracs(self.nums.copy(), self.dens.copy())
@@ -115,6 +120,13 @@ class Fracs:
         
     def __rtruediv__(fracs1: 'Fracs', fracs2: 'Fracs') -> 'Fracs':
         return fracs1.inv().__mul__(fracs2)
+    
+    def __pow__(fracs1: 'Fracs', power: int) -> 'Fracs':
+        if not isinstance(power, (int, np.signedinteger)):
+            return NotImplemented
+        if power < 0:
+            return Fracs(fracs1.dens ** power, fracs1.nums ** power).simplify()
+        return Fracs(fracs1.nums ** power, fracs1.dens ** power).simplify()
 
     def __eq__(fracs1: 'Fracs', fracs2: 'Fracs') -> bool:
         if not isinstance(fracs1, Fracs) or not isinstance(fracs2, Fracs):
@@ -145,6 +157,10 @@ class Fracs:
             raise TypeError("value can only by Frac or Fracs")
     
     @property
+    def shape(self) -> tuple[int, ...]:
+        return self.nums.shape
+
+    @property
     def T(self) -> 'Fracs':
         return Fracs(self.nums.T, self.dens.T)
 
@@ -167,6 +183,8 @@ def _main():
     assert matrix[0] == Fracs(np.array([1, 2]), np.array([9, 8]))
     assert matrix[0, 1] == Frac(1, 4)
     assert matrix[0].dot(matrix[1]) == Frac(3, 14)
+    assert matrix.get_row_sums() == Fracs(np.array([13, 23]), np.array([36, 21]))
+    assert matrix ** 2 == Fracs(np.array([[1, 1], [9, 4]]), np.array([[81, 16], [49, 9]]))
     matrix[0, 1] = Frac(9, 2)
     assert matrix == Fracs(np.array([[1, 9], [3, 2]]), np.array([[9, 2], [7, 3]]))
     matrix[0] = Fracs(np.array([5, 3]), np.array([7, 8]))

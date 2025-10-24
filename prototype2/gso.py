@@ -41,6 +41,16 @@ def compute_GSO_and_coef(basis: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
             gso_basis[i] -= coefs[i, j] * gso_basis[j]
     return gso_basis, coefs
 
+def update_GSO_and_coef(basis: np.ndarray, gso_basis: np.ndarray, coefs: np.ndarray, start_index: int):
+    assert basis.shape == gso_basis.shape == coefs.shape
+    assert len(basis.shape) == 2 and basis.shape[0] == basis.shape[1]
+    size = basis.shape[0]
+
+    for i in range(start_index, size):
+        gso_basis[i] = basis[i]
+        for j in range(i):
+            coefs[i, j] = np.dot(basis[i], gso_basis[j]) / np.dot(gso_basis[j], gso_basis[j])
+            gso_basis[i] -= coefs[i, j] * gso_basis[j]
 
 # 2 - gram schmidt with fractions
 def compute_GSO_fracs(basis: Fracs) -> Fracs:
@@ -74,7 +84,20 @@ def compute_GSO_and_coef_fracs(basis: Fracs) -> Fracs:
         for j in range(i):
             coefs[i, j] = Fracs.dot(basis[i], gso_basis[j]) / Fracs.dot(gso_basis[j], gso_basis[j])
             gso_basis[i] -= coefs[i, j] * gso_basis[j]
+        
+        #print(Fracs.dot(basis[i], gso_basis[i]) / Fracs.dot(gso_basis[i], gso_basis[i]))
     return gso_basis, coefs
+
+def update_GSO_and_coef_fracs(basis: Fracs, gso_basis: Fracs, coefs: Fracs, start_index: int):
+    assert basis.shape == gso_basis.shape == coefs.shape
+    assert len(basis.shape) == 2 and basis.shape[0] == basis.shape[1]
+    size = basis.shape[0]
+
+    for i in range(start_index, size):
+        gso_basis[i] = basis[i]
+        for j in range(i):
+            coefs[i, j] = Fracs.dot(basis[i], gso_basis[j]) / Fracs.dot(gso_basis[j], gso_basis[j])
+            gso_basis[i] -= coefs[i, j] * gso_basis[j]
 
 def _main():
     basis = np.array([
@@ -83,11 +106,11 @@ def _main():
         [2, 1, 1]
     ], dtype=float).T
 
-    gso_basis, coef = compute_GSO_and_coef(basis)
+    gso_basis, coefs = compute_GSO_and_coef(basis)
 
     print(gso_basis.T)
-    assert np.array_equal(basis.T, np.dot(gso_basis.T, coef.T))
-    assert np.array_equal(basis, np.dot(coef, gso_basis))
+    assert np.array_equal(basis.T, np.dot(gso_basis.T, coefs.T))
+    assert np.array_equal(basis, np.dot(coefs, gso_basis))
 
     basis_fracs = Fracs(basis.astype(int))
 
@@ -96,6 +119,7 @@ def _main():
     print(gso_basis_fracs.T)
     assert basis_fracs.T == Fracs.dot(gso_basis_fracs.T, coef_fracs.T)
     assert basis_fracs == Fracs.dot(coef_fracs, gso_basis_fracs)
+
 
 if __name__ == "__main__":
     _main()
