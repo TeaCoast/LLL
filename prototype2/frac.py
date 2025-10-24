@@ -30,6 +30,9 @@ class Frac(tuple[int, int]):
     def floordiv(frac: 'Frac') -> int:
         return frac.num // frac.den
 
+    def floatdiv(frac: 'Frac') -> float:
+        return frac.num / frac.den
+
     def __round__(frac: 'Frac') -> int:
         return frac.__add__(Frac(1, 2)).floordiv()
     

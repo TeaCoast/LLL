@@ -99,7 +99,7 @@ def compute_LLL(basis: np.ndarray, alpha: float):
     def swap(k):
         assert 0 < k < size
         LLL_basis[[k, k-1]] = LLL_basis[[k-1, k]]
-        #gso.update_GSO_and_coef(LLL_basis, gso_basis, coefs, k-1)
+        new_gso, new_coefs = gso.compute_GSO_and_coef(LLL_basis)
         # optimized GSO update for swap
         v = coefs[k, k-1]
         d = gso_sq[k] + v**2 * gso_sq[k-1]
@@ -133,8 +133,9 @@ def compute_LLL_fracs(basis: Fracs, alpha: float):
     size = basis.nums.shape[0]
 
     gso_basis, coefs = gso.compute_GSO_and_coef_fracs(basis)
+    print(gso_basis.nums.dtype, gso_basis.dens.dtype)
     gso_sq = gso_basis.__pow__(2).get_row_sums()
-    
+
     LLL_basis = basis.copy()
 
     def reduce(k, j):
@@ -151,17 +152,8 @@ def compute_LLL_fracs(basis: Fracs, alpha: float):
     def swap(k):
         assert 0 < k < size
         LLL_basis[k], LLL_basis[k-1] = LLL_basis[k-1], LLL_basis[k].copy()
-        print("start")
-        
-        new_gso_basis, new_coefs = gso.compute_GSO_and_coef_fracs(LLL_basis)
-        new_gso_sq = new_gso_basis.__pow__(2).get_row_sums()
-        print(new_coefs)
-        print(new_gso_basis)
-        print(new_gso_sq)
         v = coefs[k, k-1]
         d = gso_sq[k] + v**2 * gso_sq[k-1]
-        print(v)
-        print(v * gso_sq[k-1] / d)
         coefs[k, k-1] = v * gso_sq[k-1] / d
         gso_sq[k] = gso_sq[k] * gso_sq[k-1] / d
         gso_sq[k-1] = d
@@ -263,27 +255,29 @@ def _main():
         [ 3, -2,  6, -1],
         [ 2, -8, -9, -7],
         [ 8, -9,  6, -4]
-    ], dtype=float)
+    ], dtype=object)
     alpha = 1
     intended_output = np.array([
         [ 2,  3,  1,  1],
         [ 2,  0, -2, -4],
         [-2,  2,  3, -3],
         [ 3, -2,  6, -1]
-    ], dtype=float)
+    ], dtype=object)
 
     lll = LLL(basis, alpha)
     lll.compute()
 
     LLL_basis = compute_LLL(basis, alpha)
-    LLL_basis_fracs = compute_LLL_fracs(Fracs(basis.astype(int)), alpha)
+    frac_basis = Fracs(basis)
+    print(frac_basis.nums.dtype, frac_basis.dens.dtype)
+    LLL_basis_fracs = compute_LLL_fracs(Fracs(basis), alpha)
 
     assert np.array_equal(LLL_basis, np.dot(lll.transform, lll.basis))
 
     print(LLL_basis_fracs)
 
     assert np.array_equal(LLL_basis, intended_output)
-    assert LLL_basis_fracs == Fracs(intended_output.astype(int))
+    assert LLL_basis_fracs == Fracs(intended_output)
 
 if __name__ == "__main__":
     _main()

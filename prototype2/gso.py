@@ -79,7 +79,7 @@ def compute_GSO_and_coef_fracs(basis: Fracs) -> Fracs:
     size = basis.nums.shape[0]
 
     gso_basis = basis.copy()
-    coefs = Fracs(np.identity(size, dtype=int))
+    coefs = Fracs(np.identity(size, dtype=object))
     for i in range(1, size):
         for j in range(i):
             coefs[i, j] = Fracs.dot(basis[i], gso_basis[j]) / Fracs.dot(gso_basis[j], gso_basis[j])
@@ -104,7 +104,7 @@ def _main():
         [1, 1, 2],
         [1, 2, 3],
         [2, 1, 1]
-    ], dtype=float).T
+    ], dtype=object).T
 
     gso_basis, coefs = compute_GSO_and_coef(basis)
 
@@ -112,7 +112,7 @@ def _main():
     assert np.array_equal(basis.T, np.dot(gso_basis.T, coefs.T))
     assert np.array_equal(basis, np.dot(coefs, gso_basis))
 
-    basis_fracs = Fracs(basis.astype(int))
+    basis_fracs = Fracs(basis)
 
     gso_basis_fracs, coef_fracs = compute_GSO_and_coef_fracs(basis_fracs)
 

@@ -8,7 +8,7 @@ class Fracs:
     
     def __init__(self, nums: np.ndarray, dens: np.ndarray = None):
         if dens is None:
-            dens = np.ones(nums.shape, dtype=int)
+            dens = np.ones(nums.shape, dtype=object)
         assert nums.shape == dens.shape
         assert 0 not in dens
         self.nums = nums
@@ -16,7 +16,7 @@ class Fracs:
         self.simplify()
         
     def simplify(self):
-        GCDs = np.gcd(self.nums, self.dens)
+        GCDs = np.gcd(self.nums, self.dens, dtype=object)
         self.nums //= GCDs
         self.dens //= GCDs
         self.nums *= np.sign(self.dens)
@@ -40,7 +40,7 @@ class Fracs:
         elif len(fracs1.nums.shape) == len(fracs2.nums.shape) == 2:
             assert fracs1.nums.shape[1] == fracs2.nums.shape[0]
             rows, cols = (fracs1.nums.shape[0], fracs2.nums.shape[1])
-            new_fracs = Fracs(np.zeros((rows, cols), dtype=int))
+            new_fracs = Fracs(np.zeros((rows, cols), dtype=object))
             for col in range(cols):
                 col_fracs = fracs2.T[col]
                 for row in range(cols):
@@ -50,8 +50,8 @@ class Fracs:
 
     def get_row_sums(self) -> 'Fracs':
         assert len(self.shape) == 2
-        dens = np.apply_along_axis(np.lcm.reduce, axis=1, arr=self.dens)
-        nums = np.sum(dens[:, np.newaxis]*self.nums//self.dens, axis=1)
+        dens = np.apply_along_axis(lambda array: np.lcm.reduce(array, dtype=object), axis=1, arr=self.dens)
+        nums = np.sum(dens[:, np.newaxis]*self.nums//self.dens, axis=1, dtype=object)
         return Fracs(nums, dens)
     
     def copy(self) -> 'Fracs':
@@ -73,8 +73,8 @@ class Fracs:
         fracs.simplify()
         return fracs
     
-    def __radd__(fracs1: 'Fracs', fracs2: int | tuple[int, int] | Frac) -> 'Fracs':
-        return fracs1.__add__(fracs2)
+    def __radd__(fracs1: 'Fracs', frac2: int | tuple[int, int] | Frac) -> 'Fracs':
+        return fracs1.__add__(frac2)
 
     def __sub__(fracs1: 'Fracs', fracs2: 'Fracs') -> 'Fracs':
         if isinstance(fracs2, Fracs):
@@ -87,8 +87,8 @@ class Fracs:
         nums = dens*fracs1.nums//fracs1.dens - dens*nums2//dens2
         return Fracs(nums, dens).simplify()
     
-    def __rsub__(fracs1: 'Fracs', fracs2: int | tuple[int, int] | Frac) -> 'Fracs':
-        return fracs1.__neg__().__add__(fracs2)
+    def __rsub__(fracs1: 'Fracs', frac2: int | tuple[int, int] | Frac) -> 'Fracs':
+        return fracs1.__neg__().__add__(frac2)
     
     def inv(self) -> 'Fracs':
         return Fracs(self.dens, self.nums)
