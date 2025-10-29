@@ -1,3 +1,4 @@
+# prototype 2
 import numpy as np
 from frac import Frac
 from fracs import Fracs

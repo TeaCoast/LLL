@@ -15,7 +15,7 @@ def generate_basis(alpha_matrix: np.ndarray, delta: float, beta: float = 2):
     m, n = alpha_matrix.shape
     size = n + m
 
-    c = (beta**(n+m-1)*delta) ** ((n + m) / m)
+    c = (beta**(-(n+m-1))*delta**4) ** ((n + m) / (4m))
     B = np.identity(size, dtype=float)
     for row in range(m):
         for col in range(n):
